@@ -40,31 +40,28 @@ const dayThreePart1 =  () => {
   }
 
   const checkIfIsPartNumber = (l, r, lastRow, lastLine) => {
-    switch(true) {
-      case checkTop(l - 1, r, lastRow):
-        return true;
-      case checkBottom(l + 1, r, lastRow, lastLine):
-        return true;
-      case checkLeft(l, r - 1):
-        return true;
-      case checkRight(l, r + 1, lastRow):
-        return true;
-      default:
-        return false;
-    }
+      const top = checkTop(l - 1, r, lastRow);
+      const bottom = checkBottom(l + 1, r, lastRow, lastLine);
+      const left = checkLeft(l, r - 1);
+      const right = checkRight(l, r + 1, lastRow);
+      return top || bottom || left || right;
   }
   
   for (let l = 0;  l < lineArray.length; l++) {
     let chunkOfNumber = "";
-    let isPartNumber = false
+    let isPartNumber = false;
+    const lastRow = lineArray[l].length;
+    const lastLine = lineArray.length;
 
-    for (let r = 0; r < lineArray[l].length; r++) {
+    for (let r = 0; r < lastRow; r++) {
       if(lineArray[l][r]?.match(/[0-9]/g)) {
         chunkOfNumber += lineArray[l][r];
-        if(checkIfIsPartNumber(l, r, lineArray[l].length, lineArray.length)) {
+   
+        if(checkIfIsPartNumber(l, r, lastRow, lastLine)) {
           isPartNumber = true;
-        } 
-        if(r + 1 === lineArray[l].length) {
+        }
+     
+        if(r + 1 === lastRow) {
           if(chunkOfNumber && isPartNumber) {
             totalOfPartNumbers += Number(chunkOfNumber)
           }
@@ -146,14 +143,17 @@ const dayThreePart2 = () => {
   }
   
   for (let l = 0;  l < lineArray.length; l++) {
-    for (let r = 0; r < lineArray[l].length; r++) {
+    const lastRow = lineArray[l].length;
+    const lastLine = lineArray.length;
+
+    for (let r = 0; r < lastRow; r++) {
       const list = [];
 
       if(lineArray[l][r] == "*") {
         const left = checkLeft(l, r - 1);
-        const right = checkRight(l, r + 1, lineArray[l].length);
-        const top = checkTop(l - 1, r, lineArray[l].length);
-        const bottom = checkBottom(l + 1, r, lineArray[l].length, lineArray.length);
+        const right = checkRight(l, r + 1, lastRow);
+        const top = checkTop(l - 1, r, lastRow);
+        const bottom = checkBottom(l + 1, r, lastRow, lastLine);
 
         if(left) list.push(Number(left));
         if(right) list.push(Number(right));
