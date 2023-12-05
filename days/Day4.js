@@ -27,11 +27,11 @@ console.log(`Day 04 part 01 result is: ${dayFourPart1()}`)
 
 const dayFourPart2 =  () => { 
   const cardsArray = getInput("input_day4"); 
-  const rules = cardsArray.map((_, index) => ({index, copy: 0, total: 1}))
+  const rules = cardsArray.map(() => ({copy: 0, total: 1}))
 
   for (let i = 0; i < cardsArray.length; i++) {
-    const winningNumbers = getWinningNumbers(cardsArray[i])?.length;
-    for (let copy = winningNumbers; copy > 0; copy--) {
+    const hits = getWinningNumbers(cardsArray[i]).length;
+    for (let copy = hits; copy > 0; copy--) {
       const index = copy + i;
       if(rules.length > index) {
         rules[index].copy += rules[i].total;
