@@ -57,33 +57,70 @@ const getSortedTypeArrays = (types, label) => types.map(type => {
     }) : type;
   });
 
+class Rules {
+  #game = [];
+
+  constructor(game) {
+    this.#game = game;
+  }
+
+  isHighCard () {
+    return this.#game.every(n => n === 1);
+  }
+
+  isOnePair () {
+    return this.#game.filter(n => n === 1)?.length > 1 && this.#game.includes(2);
+  }
+
+  isTwoPair() {
+    return this.#game.filter(n => n === 2)?.length >= 2;
+  }
+
+  isThreeOfAKind() {
+    return this.#game.includes(3) && this.#game.includes(1);
+  }
+
+  isFullHouse() {
+    return this.#game.includes(3) && this.#game.includes(2);
+  }
+
+  isFourOfAKind() {
+    return this.#game.includes(4);
+  } 
+
+  isFiveOfAKind() {
+    return this.#game.includes(5)
+  }
+};
+
 const getSortedGameByCards = game => {
   const typesArr = Array.from({length: 7}, () => []);
 
   for(let e = 0; e < game.length; e++) {
     const keyArr = getTypes(cardsLabel, game[e].hand);
     const pushLabelRules = label => pushRules(typesArr, game[e], label);
+    const rules = new Rules(keyArr);
 
     switch (true) {
-      case keyArr.every(n => n === 1):
+      case rules.isHighCard():
         pushLabelRules(RULES.HIGH_CARD);
         break;
-      case keyArr.filter(n => n === 1)?.length > 1 && keyArr.includes(2):
+      case rules.isOnePair():
         pushLabelRules(RULES.ONE_PAIR);
         break;
-      case keyArr.filter(n => n === 2)?.length >= 2:
+      case rules.isTwoPair():
         pushLabelRules(RULES.TWO_PAIR);
         break;
-      case keyArr.includes(3) && keyArr.includes(1):
+      case rules.isThreeOfAKind():
         pushLabelRules(RULES.THREE_OF_A_KIND);
         break;
-      case keyArr.includes(3) && keyArr.includes(2):
+      case rules.isFullHouse():
         pushLabelRules(RULES.FULL_HOUSE);
         break;
-      case keyArr.includes(4):
+      case rules.isFourOfAKind():
         pushLabelRules(RULES.FOUR_OF_A_KIND);
         break;
-      case keyArr.includes(5):
+      case rules.isFiveOfAKind():
         pushLabelRules(RULES.FIVE_OF_A_KIND);
         break;
       default:
@@ -92,14 +129,14 @@ const getSortedGameByCards = game => {
   }
 
   return getSortedTypeArrays(typesArr, cardsLabel);
-}
+};
 
 const daySevenPart1 = () => { 
   const input = getInput("input_day7");
   const game = getGame(input);
   const sortedByCards = getSortedGameByCards(game);
   return getTotalPoints(sortedByCards);
-}
+};
 
 console.log(`Day 07 part 01 result is: ${daySevenPart1()}`);
 
@@ -108,29 +145,28 @@ const getSortedGameByCardsIncludingJoker = game => {
 
   for(let e = 0; e < game.length; e++) {
     const keyArr = getTypes(cardsLabelWithJoker, game[e].hand);
+    const rules = new Rules(keyArr)
     const pushLabelRules = label => pushRules(typesArr, game[e], label);
     const jokers = game[e].hand.split('').filter(s => s === 'J')?.length ?? 0;
+    const hasAJoker = jokers > 0;
 
     switch (true) {
-      //High card - 0
-      case keyArr.every(n => n === 1):
-        if(jokers > 0) {
+      case rules.isHighCard():
+        if(hasAJoker) {
           pushLabelRules(RULES.ONE_PAIR);
         } else {
           pushLabelRules(RULES.HIGH_CARD);
         }
         break;
-        //One pair - 1
-      case keyArr.filter(n => n === 1)?.length > 1 && keyArr.includes(2):
-        if(jokers > 0) {
+      case rules.isOnePair():
+        if(hasAJoker) {
           pushLabelRules(RULES.THREE_OF_A_KIND);
         } else {
           pushLabelRules(RULES.ONE_PAIR);
         }
         break;
-        //Two pair - 2
-      case keyArr.filter(n => n === 2)?.length >= 2:
-        if(jokers > 0 && jokers < 2) {
+      case rules.isTwoPair():
+        if(hasAJoker && jokers < 2) {
           pushLabelRules(RULES.FULL_HOUSE);
         } else if (jokers === 2) {
           pushLabelRules(RULES.FOUR_OF_A_KIND);
@@ -138,32 +174,28 @@ const getSortedGameByCardsIncludingJoker = game => {
           pushLabelRules(RULES.TWO_PAIR);
         }
         break;
-        //Three of a kind - 3
-      case keyArr.includes(3) && keyArr.includes(1):
-        if(jokers > 0) {
+      case rules.isThreeOfAKind():
+        if(hasAJoker) {
           pushLabelRules(RULES.FOUR_OF_A_KIND);
         } else {
           pushLabelRules(RULES.THREE_OF_A_KIND);
         }
         break;
-        //Full house - 4
-      case keyArr.includes(3) && keyArr.includes(2):
-        if(jokers > 0) {
+      case rules.isFullHouse():
+        if(hasAJoker) {
           pushLabelRules(RULES.FIVE_OF_A_KIND);
         } else {
           pushLabelRules(RULES.FULL_HOUSE);
         }
         break;
-        //Four of a kind - 5
-      case keyArr.includes(4):
-        if(jokers > 0) {
+      case rules.isFourOfAKind():
+        if(hasAJoker) {
           pushLabelRules(RULES.FIVE_OF_A_KIND);
         } else {
           pushLabelRules(RULES.FOUR_OF_A_KIND);
         }
         break;
-        //Five of a kind - 6
-      case keyArr.includes(5):
+      case rules.isFiveOfAKind():
         pushLabelRules(RULES.FIVE_OF_A_KIND);
         break;
       default:
@@ -172,13 +204,13 @@ const getSortedGameByCardsIncludingJoker = game => {
   }
 
   return getSortedTypeArrays(typesArr, cardsLabelWithJoker)
-}
+};
 
 const daySevenPart2 = () => { 
   const input = getInput("input_day7");
   const game = getGame(input);
   const sortedByCards = getSortedGameByCardsIncludingJoker(game);
   return getTotalPoints(sortedByCards);
-}
+};
 
 console.log(`Day 07 part 02 result is: ${daySevenPart2()}`);
