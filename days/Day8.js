@@ -38,7 +38,7 @@ const dayEightPart1 = () => {
 
 console.log(`Day 08 part 01 result is: ${dayEightPart1()}`);
 
-const getLMC = (stepsArr) => {
+const getLCM = (stepsArr) => {
   const primeFactorization = new Set();
 
   for(let s = 0; s < stepsArr.length; s++) {
@@ -100,7 +100,7 @@ const dayEightPart2 = () => {
     index = 0;
   }  
 
-  return getLMC(stepsArr);
+  return getLCM(stepsArr);
 }
 
 console.log(`Day 08 part 02 result is: ${dayEightPart2()}`);
