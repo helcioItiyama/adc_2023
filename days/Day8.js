@@ -3,8 +3,8 @@ const getInput = require("../util");
 const getRoutes = (input, nodes) => {
   return input.reduce((acc, r, i) => {
     if(i > 0 && r !== '') {
-      [key, directions] = r.split(' = ');
-      [left, right] =  directions.replace(/[()\s]/g, "").split(",");
+      const [key, directions] = r.split(' = ');
+      const [left, right] =  directions.replace(/[()\s]/g, "").split(",");
       acc[key] = {L: left, R: right};
       if(nodes && key[key.length - 1] === 'A') {
         nodes.push(key);
