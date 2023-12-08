@@ -1,11 +1,14 @@
 const getInput = require("../util");
 
-const getRoutes = input => {
+const getRoutes = (input, nodes) => {
   return input.reduce((acc, r, i) => {
     if(i > 0 && r !== '') {
       [key, directions] = r.split(' = ');
       [left, right] =  directions.replace(/[()\s]/g, "").split(",");
       acc[key] = {L: left, R: right};
+      if(nodes && key[key.length - 1] === 'A') {
+        nodes.push(key);
+      }
     }
     return acc;
   }, {})
@@ -21,9 +24,9 @@ const getSteps = (instructions, routes, node) => {
     if(index >= instructions.length - 1) {
       index = 0;
     } else {
-      index++
+      index++;
     }
-    steps++
+    steps++;
   }
   return steps;
 }
@@ -33,7 +36,7 @@ const dayEightPart1 = () => {
   const instructions = input[0];
   let node = 'AAA';
   const routes = getRoutes(input);
-  return getSteps(instructions, routes, node)
+  return getSteps(instructions, routes, node);
 }
 
 console.log(`Day 08 part 01 result is: ${dayEightPart1()}`);
@@ -56,7 +59,7 @@ const getLCM = (stepsArr) => {
     }
     
     if(number > 2) {
-      primeFactorization.add(number)
+      primeFactorization.add(number);
     }
   }
 
@@ -69,17 +72,7 @@ const dayEightPart2 = () => {
   const nodes = [];
   const stepsArr = [];
 
-  const routes = input.reduce((acc, r, i) => {
-    if(i > 0 && r !== '') {
-      [key, directions] = r.split(' = ');
-      [left, right] =  directions.replace(/[()\s]/g, "").split(",");
-      acc[key] = {L: left, R: right};
-      if(key[key.length - 1] === 'A') {
-        nodes.push(key)
-      }
-    }
-    return acc;
-  }, {});
+  const routes = getRoutes(input, nodes)
 
   for(let i = 0; i < nodes.length; i++) {
     let steps = 0;
@@ -91,9 +84,9 @@ const dayEightPart2 = () => {
       if(index >= instructions.length - 1) {
         index = 0;
       } else {
-        index++
+        index++;
       }
-      steps++
+      steps++;
     }
     stepsArr.push(steps);
     steps = 0;
