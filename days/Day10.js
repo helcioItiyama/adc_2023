@@ -63,6 +63,7 @@ const dayTenPart1 = () => {
   const input = getInput("input_day10").map(s => s.split(""));
   const current = [];
   let counter = 0;
+  const queue = []
 
   for(let l = 0; l < input.length; l++) {
     for(let r = 0; r < input[l].length; r++) {
@@ -135,6 +136,7 @@ const dayTenPart1 = () => {
         const current = input[line][row];
         if(current === 'S') {
           counter += 1;
+          queue.push(input[line][row])
           input[line][row] = "G"
         } else if(current === 'G') {
           keepGoing = false;
@@ -142,19 +144,76 @@ const dayTenPart1 = () => {
           keepGoing = false;
         } else {
           counter += 1;
-          input[line][row] = "V";
+          queue.push(input[line][row])
+          switch(input[line][row]) {
+            case "F":
+              input[line][row] = "┏"
+              break;
+            case "L":
+              input[line][row] = "┗"
+              break;
+            case "J":
+              input[line][row] = "┛"
+              break;
+            case "7":
+              input[line][row] = "┓"
+              break;
+            case "-":
+              input[line][row] = "━"
+              break;
+            case "|":
+              input[line][row] = "┃"
+              break;
+
+            default:
+              break;
+          }
         }
       } else {
         keepGoing = false
       }
     }
   }
+
+ 
    
   for (const direction in directions) {
     getCounter(current[0], current[1], direction);
   }
+  
+  const fs = require('fs');
+  const path = require('path');
+
+  fs.writeFileSync(
+    path.join(__dirname, '../inputs/input_day10_part2.txt'),
+    input.map(e => e.join('')).toString().replace(/,/g, '\n'),
+  );
 
   return Math.ceil(counter/2)
 }
 
 console.log(`Day 10 part 01 result is: ${dayTenPart1()}`);
+
+const dayTenPart2 = () => { 
+  const input = getInput("input_day10_part2").map(e => e.split(''));
+  let enclosedTiles = 0;
+
+  for (let line of input) {
+    let pipe = 0;
+    for (let i = 0; i < line.length; i++) {
+      if(line[i] ===  "┛"|| line[i] === "┗" || line[i] === "┃") {
+        pipe += 1;
+      } else if(line[i] !== "━" && line[i] !== "┏"  && line[i] !== "┓" ) {
+        if(pipe % 2 === 0) {
+          line[i] = "O";
+        } else {
+          line[i] = "I";
+          enclosedTiles += 1;
+        }
+      }
+    }
+  }
+  return enclosedTiles;
+}
+
+console.log(`Day 10 part 02 result is: ${dayTenPart2()}`);
