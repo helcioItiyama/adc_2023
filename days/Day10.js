@@ -200,14 +200,14 @@ const dayTenPart2 = () => {
 
   for (let line of input) {
     let pipe = 0;
-    for (let i = 0; i < line.length; i++) {
-      if(line[i] ===  "┛"|| line[i] === "┗" || line[i] === "┃") {
+    for (let char of line) {
+      if(char ===  "┛"|| char === "┗" || char === "┃") {
         pipe += 1;
-      } else if(line[i] !== "━" && line[i] !== "┏"  && line[i] !== "┓" ) {
+      } else if(char !== "━" && char !== "┏"  && char !== "┓" ) {
         if(pipe % 2 === 0) {
-          line[i] = "O";
+          char = "O";
         } else {
-          line[i] = "I";
+          char = "I";
           enclosedTiles += 1;
         }
       }
