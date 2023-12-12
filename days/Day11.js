@@ -1,34 +1,52 @@
 const getInput = require("../util");
 
-const getPairs = (arr, stars) => {
-  const starsIndexes = {}
-  const pairs = []
+const getPairIndexes = (arr, stars, emptyLines, emptyColumns, enlarging) => {
+  const starsIndexes = {};
 
   arr.forEach((e, i)=> {
     for(let l = 1; l < stars; l++) {
-        const index = e.findIndex(s => s=== l.toString());
-        if(index >= 0) {
-          starsIndexes[l] = {l: i, c: index}
+      const index = e.findIndex(s => s=== l.toString());
+      let line = i;
+      let column = index;
+
+      for(let eL = 0; eL < emptyLines.length; eL++) {
+        if(i > emptyLines[eL]) {
+          line += enlarging;
         }
       }
-    })
 
-  let i = 1;
-  while(i < stars) {
-    let pair = i + 1;
-    while(pair < stars) {
-      pairs.push([i, pair]);
-      pair++;
+      for(let eC = 0; eC < emptyColumns.length; eC++) {
+        if(index > emptyColumns[eC]) {
+          column += enlarging;
+        }
+      }
+
+      if(column >= 0) {
+        starsIndexes[l] = {l: line, c: column};
+      }
     }
-    i++;
-  }
-  return {pairs, starsIndexes};
+  })
+  return starsIndexes;
 }
 
-const dayElevenPart1 =  () => { 
-  const universe = getInput("input_day11").map(e => e.split('')); 
+const getPairs = stars => {
+  const pairs = [];
+
+  let i = 1;
+    while(i < stars) {
+      let pair = i + 1;
+      while(pair < stars) {
+        pairs.push([i, pair]);
+        pair++;
+      }
+      i++;
+    }
+    return pairs;
+}
+
+const getEmptyColumnsAndLines = universe => {
   const emptyLines = [];
-  const emptyColumns = Array.from({length: universe[0].length}, () => false);
+  const columns = Array.from({length: universe[0].length}, () => false);
   let counter = 1;
 
   for (let l = 0; l < universe.length; l++) {
@@ -36,7 +54,7 @@ const dayElevenPart1 =  () => {
     for(let c = 0; c < universe[l].length; c++ ) {
       if(universe[l][c] !== '.') {
         hasStars = true;
-        emptyColumns[c] = true;
+        columns[c] = true;
         universe[l][c] = counter.toString();
         counter += 1;
       }
@@ -45,28 +63,33 @@ const dayElevenPart1 =  () => {
       emptyLines.push(l);
     }
   }
+  const emptyColumns = columns.map((col, i) => col ? col : col = i).filter(e => typeof e === 'number');
+  return {emptyLines, emptyColumns, counter}
+}
 
-  emptyLines.reverse().forEach(line => {
-    universe.splice(line, 0, Array.from({length: universe[0].length}, () => '.'));
-  });
+const getTotalDistance = (pairs, starsIndexes) => pairs.reduce((acc, e) => {
+  const sec = starsIndexes[e[1]];
+  const first = starsIndexes[e[0]];
+  const total = Math.abs(sec.l - first.l) + Math.abs(sec.c - first.c);
+  return acc + total;
+}, 0)
 
-  emptyColumns
-    .map((col, i) => col ? col : col = i)
-    .filter(e => typeof e === 'number')
-    .reverse()
-    .forEach(extra => {
-      universe.forEach(l =>
-         l.splice(extra, 0, '.'));
-    });
-
-  const {pairs, starsIndexes} = getPairs(universe, counter);
-
-  return pairs.reduce((acc, e) => {
-    const sec = starsIndexes[e[1]];
-    const first = starsIndexes[e[0]];
-    const total = Math.abs(sec.l - first.l) + Math.abs(sec.c - first.c);
-    return acc + total;
-  }, 0)
+const dayElevenPart1 =  () => { 
+  const universe = getInput("input_day11").map(e => e.split('')); 
+  const {emptyLines, emptyColumns, counter} = getEmptyColumnsAndLines(universe);
+  const starsIndexes = getPairIndexes(universe, counter, emptyLines, emptyColumns, 1);
+  const pairs = getPairs(counter);
+  return getTotalDistance(pairs, starsIndexes);
 }
 
 console.log(`Day 11 part 01 result is: ${dayElevenPart1()}`)
+
+const dayElevenPart2 =  () => { 
+  const universe = getInput("input_day11").map(e => e.split('')); 
+  const {emptyLines, emptyColumns, counter} = getEmptyColumnsAndLines(universe);
+  const starsIndexes = getPairIndexes(universe, counter, emptyLines, emptyColumns, 999_999);
+  const pairs = getPairs(counter);
+  return getTotalDistance(pairs, starsIndexes);
+}
+
+console.log(`Day 11 part 02 result is: ${dayElevenPart2()}`)
